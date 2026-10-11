@@ -13,7 +13,13 @@ export async function POST(request: Request) {
   const key = process.env.OPENAI_API_KEY;
   if (!key) return reply({ error: "API anahtarı bulunamadı." }, 503);
   const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin)
+
+  const allowedOrigins = new Set([
+    new URL(request.url).origin,
+    "https://meryem-sef-production.up.railway.app",
+  ]);
+
+  if (origin && !allowedOrigins.has(origin))
     return reply({ error: "İstek kaynağı geçersiz." }, 403);
   const raw = await request.text();
   if (raw.length > 50000) return reply({ error: "İstek çok uzun." }, 400);

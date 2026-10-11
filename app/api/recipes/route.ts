@@ -49,7 +49,13 @@ export async function POST(request: Request) {
     );
   // A browser from another site must not initiate paid requests.
   const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin)
+
+  const allowedOrigins = new Set([
+    new URL(request.url).origin,
+    "https://meryem-sef-production.up.railway.app",
+  ]);
+
+  if (origin && !allowedOrigins.has(origin))
     return reply({ error: "İstek kaynağı geçersiz.", code: "origin" }, 403);
   const raw = await request.text();
   if (raw.length > 8000)
