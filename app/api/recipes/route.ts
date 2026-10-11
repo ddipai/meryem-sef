@@ -56,7 +56,20 @@ export async function POST(request: Request) {
   ]);
 
   if (origin && !allowedOrigins.has(origin))
-    return reply({ error: "İstek kaynağı geçersiz.", code: "origin" }, 403);
+    if (origin && !allowedOrigins.has(origin)) {
+      return reply(
+        {
+          error: "İstek kaynağı geçersiz.",
+          code: "origin",
+          details: {
+            version: "origin-check-v2",
+            receivedOrigin: origin,
+            allowedOrigins: Array.from(allowedOrigins),
+          },
+        },
+        403,
+      );
+    }
   const raw = await request.text();
   if (raw.length > 8000)
     return reply({ error: "İstek çok uzun.", code: "validation" }, 400);
